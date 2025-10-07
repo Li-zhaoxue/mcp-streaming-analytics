@@ -5,7 +5,9 @@ A Model Context Protocol (MCP) server for analyzing streaming platform data (mus
 ## Features
 
 ### Data Model
+
 The database includes realistic streaming platform data with:
+
 - **Users**: subscription tiers, demographics, churn tracking
 - **Content**: movies, series, songs, albums, podcasts
 - **Streaming Events**: play history, completion rates, device/platform tracking
@@ -37,26 +39,47 @@ The database includes realistic streaming platform data with:
 ## Setup
 
 ### Prerequisites
+
 - Python 3.10+
 - Docker & Docker Compose
-- PostgreSQL (via Docker)
+- [uv](https://docs.astral.sh/uv/) - Install with `brew install uv` (macOS) or `pip install uv`
 
 ### Installation
 
-1. **Start the database**:
+1. **Clone and navigate to the project**:
+
 ```bash
+git clone https://github.com/Li-zhaoxue/mcp-streaming-analytics.git
 cd mcp-streaming-analytics
-docker-compose up -d
 ```
 
-Wait for the database to initialize (check with `docker-compose logs -f`).
+2. **Set up Python environment**:
 
-2. **Install Python dependencies**:
 ```bash
-pip install -e .
+# Create virtual environment
+uv venv
+
+# Activate virtual environment
+source .venv/bin/activate  # macOS/Linux
+# OR
+.venv\Scripts\activate     # Windows
+
+# Install dependencies
+uv sync
 ```
 
-3. **Verify database connection**:
+**Note**: To stop the virtual environment, run `deactivate` in terminal.
+
+3. **Start the database**:
+
+```bash
+docker compose up -d
+```
+
+Wait for the database to initialize (check with `docker compose logs -f`).
+
+4. **Verify database connection**:
+
 ```bash
 docker exec -it streaming-db psql -U streaming_user -d streaming_analytics -c "SELECT COUNT(*) FROM users;"
 ```
@@ -64,11 +87,13 @@ docker exec -it streaming-db psql -U streaming_user -d streaming_analytics -c "S
 ### Running the MCP Server
 
 #### Development Mode
+
 ```bash
 python src/server.py
 ```
 
 #### With MCP Inspector (for testing)
+
 ```bash
 npx @modelcontextprotocol/inspector python src/server.py
 ```
@@ -82,7 +107,9 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
   "mcpServers": {
     "streaming-analytics": {
       "command": "python",
-      "args": ["/Users/li/Desktop/lib/data-agent/mcp-streaming-analytics/src/server.py"],
+      "args": [
+        "/Users/li/Desktop/lib/data-agent/mcp-streaming-analytics/src/server.py"
+      ],
       "env": {
         "DB_HOST": "localhost",
         "DB_PORT": "5432",
@@ -100,21 +127,25 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 ### Using Tools
 
 **Find at-risk premium users**:
+
 ```
 Use the churn_prediction tool with subscription_tier="premium" and days_threshold=7
 ```
 
 **Analyze signup funnel**:
+
 ```
 Use the funnel_analysis tool with funnel_name="signup"
 ```
 
 **Get top performing content**:
+
 ```
 Use the content_performance tool with content_type="series" and min_plays=2
 ```
 
 **Cohort retention analysis**:
+
 ```
 Use the cohort_analysis tool with cohort_month="2024-01" and metric="retention"
 ```
@@ -122,6 +153,7 @@ Use the cohort_analysis tool with cohort_month="2024-01" and metric="retention"
 ### Custom SQL Queries
 
 **User engagement by country**:
+
 ```sql
 SELECT
     u.country,
@@ -136,6 +168,7 @@ ORDER BY total_hours DESC
 ```
 
 **Content binge-watching analysis**:
+
 ```sql
 SELECT
     c.title,
@@ -152,6 +185,7 @@ LIMIT 10
 ## Database Schema
 
 Key tables:
+
 - `users` - User accounts with subscription and churn info
 - `content` - Streaming content catalog
 - `streaming_events` - Playback events with completion tracking
@@ -177,35 +211,41 @@ Key tables:
 ## Development
 
 ### Add More Seed Data
+
 Edit `database/seeds/01_seed_data.sql` and restart the database:
+
 ```bash
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 ### Extend the MCP Server
+
 Add new tools or resources in `src/server.py`:
-- Tools: Add to `@app.list_tools()` and `@app.call_tool()`
-- Resources: Add to `@app.list_resources()` and `@app.read_resource()`
+
+- Tools: Add to `@mcp.list_tools()` and `@mcp.call_tool()`
+- Resources: Add to `@mcp.list_resources()` and `@mcp.read_resource()`
 
 ## Troubleshooting
 
 **Database connection issues**:
+
 ```bash
 # Check if database is running
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs -f postgres
+docker compose logs -f postgres
 
 # Restart database
-docker-compose restart postgres
+docker compose restart postgres
 ```
 
 **Reset database**:
+
 ```bash
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 ## License
