@@ -99,16 +99,20 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 {
   "mcpServers": {
     "streaming-analytics": {
-      "command": "python",
+      "command": "uv",
       "args": [
-        "/path/to/mcp-streaming-analytics/src/server.py"
+        "--directory",
+        "/path/to/mcp-streaming-analytics",
+        "run",
+        "python",
+        "src/server.py"
       ]
     }
   }
 }
 ```
 
-**Note**: Replace `/path/to/mcp-streaming-analytics` with your actual project path. Database credentials are loaded automatically from the `.env` file.
+**Note**: Replace `/path/to/mcp-streaming-analytics` with your actual project path. Using `uv run` automatically manages the virtual environment. Database credentials are loaded automatically from the `.env` file.
 
 ## Example Queries
 
