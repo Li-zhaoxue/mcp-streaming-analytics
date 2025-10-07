@@ -5,7 +5,9 @@ Provides tools and resources for analyzing streaming platform data
 """
 
 import os
+import sys
 import asyncio
+from pathlib import Path
 from typing import Any, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -15,16 +17,18 @@ from mcp.server import Server
 from mcp.types import Tool, TextContent, Resource, ResourceTemplate
 from mcp.server.stdio import stdio_server
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from .env file in project root
+# env_path = './.env'
+# load_dotenv(dotenv_path=env_path, override=True)
 
-# Database configuration
+# Database configuration - hardcoded defaults for local development
+# Override these with environment variables in production
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": int(os.getenv("DB_PORT", "5432")),
-    "database": os.getenv("DB_NAME", "streaming_analytics"),
-    "user": os.getenv("DB_USER", "streaming_user"),
-    "password": os.getenv("DB_PASSWORD", "streaming_pass"),
+    "host": "127.0.0.1",  # Use IPv4 explicitly instead of localhost
+    "port": 5432,
+    "database": "streaming_analytics",
+    "user": "streaming_user",
+    "password": "streaming_pass",
 }
 
 
@@ -43,13 +47,16 @@ class DatabaseConnection:
 
     def execute_query(self, query: str, params: Optional[tuple] = None) -> list[dict]:
         """Execute a query and return results as list of dicts"""
-        conn = self.connect()
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query, params)
-            if cur.description:
-                return [dict(row) for row in cur.fetchall()]
-            conn.commit()
-            return []
+        try:
+            conn = self.connect()
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, params)
+                if cur.description:
+                    return [dict(row) for row in cur.fetchall()]
+                conn.commit()
+                return []
+        except Exception as e:
+            raise Exception(f"Database error: {str(e)}. Config: host={self.config['host']}, db={self.config['database']}, user={self.config['user']}")
 
     def close(self):
         """Close database connection"""
@@ -413,7 +420,8 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
                 ORDER BY metric_date DESC
             """
 
-            results = db.execute_query(query, tuple(params) if params else None)
+            results = db.execute_query(
+                query, tuple(params) if params else None)
             return [TextContent(type="text", text=str(results))]
 
         elif name == "content_performance":

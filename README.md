@@ -42,18 +42,21 @@ The database includes realistic streaming platform data with:
 
 - Python 3.10+
 - Docker & Docker Compose
-- [uv](https://docs.astral.sh/uv/) - Install with `brew install uv` (macOS) or `pip install uv`
+- PostgreSQL (via Docker)
+- [uv](https://docs.astral.sh/uv/) (recommended) or `brew install uv`
 
 ### Installation
 
-1. **Clone and navigate to the project**:
+1. **Start the database**:
 
 ```bash
-git clone https://github.com/Li-zhaoxue/mcp-streaming-analytics.git
 cd mcp-streaming-analytics
+docker compose up -d
 ```
 
-2. **Set up Python environment**:
+Wait for the database to initialize (check with `docker compose logs -f`).
+
+2. **Create virtual environment and install dependencies**:
 
 ```bash
 # Create virtual environment
@@ -65,20 +68,10 @@ source .venv/bin/activate  # macOS/Linux
 .venv\Scripts\activate     # Windows
 
 # Install dependencies
-uv sync
+uv pip install -r requirements.txt
 ```
 
-**Note**: To stop the virtual environment, run `deactivate` in terminal.
-
-3. **Start the database**:
-
-```bash
-docker compose up -d
-```
-
-Wait for the database to initialize (check with `docker compose logs -f`).
-
-4. **Verify database connection**:
+3. **Verify database connection**:
 
 ```bash
 docker exec -it streaming-db psql -U streaming_user -d streaming_analytics -c "SELECT COUNT(*) FROM users;"

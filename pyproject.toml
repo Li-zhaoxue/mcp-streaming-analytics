@@ -1,22 +1,10 @@
 [project]
 name = "mcp-streaming-analytics"
 version = "0.1.0"
-description = "MCP server for streaming analytics data"
+description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 dependencies = [
-    "mcp[cli]>=1.1.2",
-    "psycopg2-binary>=2.9.9",
-    "python-dotenv>=1.0.0"
-]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.uv]
-dev-dependencies = [
-    "pytest>=8.0.0",
-    "black>=24.0.0",
-    "ruff>=0.3.0"
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.16.0",
 ]
