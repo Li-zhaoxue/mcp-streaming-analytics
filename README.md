@@ -101,19 +101,14 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
     "streaming-analytics": {
       "command": "python",
       "args": [
-        "/Users/li/Desktop/lib/data-agent/mcp-streaming-analytics/src/server.py"
-      ],
-      "env": {
-        "DB_HOST": "localhost",
-        "DB_PORT": "5432",
-        "DB_NAME": "streaming_analytics",
-        "DB_USER": "streaming_user",
-        "DB_PASSWORD": "streaming_pass"
-      }
+        "/path/to/mcp-streaming-analytics/src/server.py"
+      ]
     }
   }
 }
 ```
+
+**Note**: Replace `/path/to/mcp-streaming-analytics` with your actual project path. Database credentials are loaded automatically from the `.env` file.
 
 ## Example Queries
 

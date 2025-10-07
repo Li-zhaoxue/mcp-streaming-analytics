@@ -5,7 +5,6 @@ Provides tools and resources for analyzing streaming platform data
 """
 
 import os
-import sys
 import asyncio
 from pathlib import Path
 from typing import Any, Optional
@@ -14,21 +13,20 @@ from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
 from mcp.server import Server
-from mcp.types import Tool, TextContent, Resource, ResourceTemplate
+from mcp.types import Tool, TextContent, Resource
 from mcp.server.stdio import stdio_server
 
 # Load environment variables from .env file in project root
-# env_path = './.env'
-# load_dotenv(dotenv_path=env_path, override=True)
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path, override=True)
 
-# Database configuration - hardcoded defaults for local development
-# Override these with environment variables in production
+# Database configuration - uses .env file with fallback defaults
 DB_CONFIG = {
-    "host": "127.0.0.1",  # Use IPv4 explicitly instead of localhost
-    "port": 5432,
-    "database": "streaming_analytics",
-    "user": "streaming_user",
-    "password": "streaming_pass",
+    "host": os.getenv("DB_HOST", "127.0.0.1"),
+    "port": int(os.getenv("DB_PORT", "5432")),
+    "database": os.getenv("DB_NAME", "streaming_analytics"),
+    "user": os.getenv("DB_USER", "streaming_user"),
+    "password": os.getenv("DB_PASSWORD", "streaming_pass"),
 }
 
 
